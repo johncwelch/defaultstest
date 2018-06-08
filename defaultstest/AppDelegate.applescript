@@ -81,9 +81,6 @@ script AppDelegate
 	end getSettings:
 	
 	on clearSettings:sender
-		--theDefaults's removeObjectForKey:"serverName"
-		--theDefaults's removeObjectForKey:"serverURL"
-		--theDefaults's removeObjectForKey:"serverAPIKey"
 		theDefaults's removeObjectForKey:"serverSettingsList" --blank out defaults plist on disk
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
 		my loadServerTable:(missing value) --reload table with read data, in this case, the table should be blank

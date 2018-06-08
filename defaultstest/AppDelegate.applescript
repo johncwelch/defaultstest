@@ -24,14 +24,16 @@ script AppDelegate
 	property theServerURL : "" --bound to server URL text field
 	property theServerAPIKey : "" --bound to server API Key text field
 	
-	property theTableServerName : ""
-	property theTableServerURL : ""
-	property theTableServerAPIKey : ""
-	property theServerTableControllerArray : {}
+	property theTableServerName : "" --bound to server name column in table
+	property theTableServerURL : "" --bound to server url column in table
+	property theTableServerAPIKey : "" --bound to server API Key column in table
+	property theServerTableControllerArray : {} --bound to content of the server table controller, not used
 	
-	property theTestDefaults: ""
+	property theTestDefaults: "" --not currently used
 	property theSettingsList: {} --what will be the list of records we pull from the prefs file
+	property theSettingsExist : "" --are there any settings already there?
 	property theServerList : {} --list used to load the table
+	property theDefaultsExist : "" --are there currently settings?
 	
 	--this next line is only here to show how to clear out defaults if you're using a shared defautls controller
 	--current application's NSUserDefaultsController's sharedUserDefaultsController()'s revertToInitialValues: initialDefaults
@@ -45,30 +47,36 @@ script AppDelegate
 		--we use for this
 		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --we do this because
 		--NSDefaults arrayForKey coerces NSMutableArray to NSArray, which is annoying
+		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults"
+		--current application's NSLog("theDefaultsExist: %@", my theDefaultsExist)
+		
 		my theSettingsList's addObjectsFromArray:theTempArray --copy all the data from theTempArray into theSettingList, which keeps the
 		--latter mutable
-		--set my theSettingsList to theDefaults's arrayForKey:"serverSettingsList" --load the settings list (important for array controller)
-		--set x to my theSettingsController's selectedObjects()'s firstObject() --this grabs the initial record
+		if not my theDefaultsExist then
+			display dialog "there are no default settings written at launch"
+		end if
 		my loadServerTable:(missing value) --load existing data into the server table.
 	end applicationWillFinishLaunching_
 	
-	on loadServerTable:sender
+	on loadServerTable:sender --push the saved server array into a table
 		set my theServerList to {} --blank out the list for next use
-		--current application's NSLog("theServerList at start ot loadServer: %@", my theServerList)
-		repeat with x from 1 to count of my theSettingsList
+		repeat with x from 1 to count of my theSettingsList --iterate through the settings list to build the record we'll use here
 			set theItem to item x of my theSettingsList as record
 			set the end of my theServerList to {theTableServerName:serverName of theItem,theTableServerURL:serverURL of theItem,theTableServerAPIKey:serverAPIKey of theItem} --DON'T use "my" here, it really hates it.
 		end repeat
 		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
 		--array controller
 		my theServerTableController's addObjects:my theServerList --shove all that data in theServerList into the array controller
+		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --grab current state for this every time this function runs
 		set my theServerList to {} --blank out the list for next use
 	end loadServerTable:
 	
 	on saveSettings:sender
 		set thePrefsRecord to {serverName:my theServerName,serverURL:my theServerURL,serverAPIKey:my theServerAPIKey} --build the record
 		my theSettingsList's addObject:thePrefsRecord --add the record to the end of the settings list
+		set my theDefaultsExist to true
 		theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
+		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults"
 		my loadServerTable:(missing value) --reload table with new data
 	end saveSettings:
 	
@@ -76,12 +84,14 @@ script AppDelegate
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
 		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList")
 		my theSettingsList's addObjectsFromArray:theTempArray
+		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults"
 		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
 		my loadServerTable:(missing value) --reload table with read data
 	end getSettings:
 	
 	on clearSettings:sender
 		theDefaults's removeObjectForKey:"serverSettingsList" --blank out defaults plist on disk
+		theDefaults's removeObjectForKey:"hasDefaults" --blank out the hasDefaults key
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
 		my loadServerTable:(missing value) --reload table with read data, in this case, the table should be blank
 	end clearSettings

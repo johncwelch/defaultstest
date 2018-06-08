@@ -74,24 +74,26 @@ script AppDelegate
 	on saveSettings:sender
 		set thePrefsRecord to {serverName:my theServerName,serverURL:my theServerURL,serverAPIKey:my theServerAPIKey} --build the record
 		my theSettingsList's addObject:thePrefsRecord --add the record to the end of the settings list
-		set my theDefaultsExist to true
+		set my theDefaultsExist to true --since we're writing a setting, we want to set this correctly.
 		theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
-		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults"
+		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1)
 		my loadServerTable:(missing value) --reload table with new data
 	end saveSettings:
 	
 	on getSettings:sender --re-read data from the defaults file
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
-		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList")
-		my theSettingsList's addObjectsFromArray:theTempArray
-		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults"
+		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --since we're
+		--re-reading from the disk, we have to do the temp NSArray --> NSMutableArray dance again.
+		my theSettingsList's addObjectsFromArray:theTempArray --reload our NSMutableArray so it doesn't get coerced to NSArray
+		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --pull the "do we even have default settings" flag
 		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
 		my loadServerTable:(missing value) --reload table with read data
 	end getSettings:
 	
 	on clearSettings:sender
 		theDefaults's removeObjectForKey:"serverSettingsList" --blank out defaults plist on disk
-		theDefaults's removeObjectForKey:"hasDefaults" --blank out the hasDefaults key
+		theDefaults's removeObjectForKey:"hasDefaults" --blank out the hasDefaults key, that is now false (0). Well, actually, it's nonexistent
+		--but really, that's the same thing for our needs. We can fix this later if we want.
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
 		my loadServerTable:(missing value) --reload table with read data, in this case, the table should be blank
 	end clearSettings
@@ -102,7 +104,7 @@ script AppDelegate
 	end applicationShouldTerminate_
 	
 	on applicationShouldTerminateAfterLastWindowClosed:sender
-		return true
+		return true --quit when window is closed
 	end applicationShouldTerminateAfterLastWindowClosed:
 	
 end script

@@ -111,10 +111,33 @@ script AppDelegate
 	end clearSettings
 	
 	on deleteServer:sender
-		current application's NSLog("current settings array contents: %@", my theSettingsController's arrangedObjects()) --everything in the settings
+		set theTestIndex to my theServerTable's selectedRow() --get the index of the currently selected row from the table
+		my theSettingsList's removeObjectAtIndex:theTestIndex --delete that from theSettingsList. Since the table is built from theSettingsSlist,
+		--this is somewhat dicey, but safe given that we immediately rebuild the table AND the prefs on clicking the button.
+		--if we want to delete multiple servers, this will need to be changed.
 		
-		current application's NSLog("current settings array contents: %@", my theServerTableController's selectedObjects()) -- the selected row
-		--we're going to have to translate the selected row to data we can use to modify my theSettingsList to pull that record out of it, then re-write that into the settings once that's done. 
+		--reload the server table in the UI. We do this first so the user can see their actions have taken.
+		my loadServerTable:(missing value)
+		
+		--write the new prefs to disk. We really should warn the user that this is not undoable.
+		--first, test to make sure the prefs aren't zero length
+		set theSettingsListLength to my theSettingsList's |count|() --get number of entries in the array.
+		--we need to do this before we act on writing things to disk.
+		if theSettingsListLength = 0 then --if the list is empty (we just deleted the last thing) then we'll call clear settings and save time
+			--since that's what clear settings does, if you think about it
+			my clearSettings:(missing value) --this handles explicitly clearing the defaults AND hasDefaults for us.
+		else
+			--so we have entries in the array, let's write that to disk
+			set my theDefaultsExist to true --if we're in this stage of the if, there's at least one row in theSettingsList,
+			--so we want to make sure theDefaultsExist is correct.
+			theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
+			theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1), this way we avoid the
+			--"but I thought it was okay" problem. We don't think we know what hasDefaults is on exit, we KNOW
+
+			
+		end if
+		my loadServerTable:(missing value) -- regardless of the if statement tree, we want to do this for both. if this ever gets really big
+		--we'll change this behavior, but it would have to get pretty damned big to be a problem.
 		
 	end deleteServer:
 	

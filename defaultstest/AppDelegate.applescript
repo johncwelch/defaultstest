@@ -71,13 +71,25 @@ script AppDelegate
 		set my theServerList to {} --blank out the list for next use
 	end loadServerTable:
 	
-	on saveSettings:sender
+	on saveSettings:sender --
+		set theTempURL to my theServerURL as text  --Create a temp text version
+		set theLastChar to last character of theTempURL --get the last character of the URL
+		if theLastChar is "/" then --if it's a trailing "/"
+			set theTempURL to text 1 thru -2 of theTempURL --trim the last character of the string
+			set my theServerURL to current application's NSString's stringWithString:theTempURL --rewrite theServerURL. As it turns out,
+			--you have to use the current application's NSString's stringWithString for this, NOT theServerURL's stringWithString. Beats me
+			--scoping maybe? <shrug>
+		end if
+		set my theServerURL to my theServerURL's stringByAppendingString:"/nagiosxi/api/v1/system/user?apikey=" --NSSTring append
 		set thePrefsRecord to {serverName:my theServerName,serverURL:my theServerURL,serverAPIKey:my theServerAPIKey} --build the record
 		my theSettingsList's addObject:thePrefsRecord --add the record to the end of the settings list
 		set my theDefaultsExist to true --since we're writing a setting, we want to set this correctly.
 		theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
 		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1)
 		my loadServerTable:(missing value) --reload table with new data
+		set my theServerURL to ""
+		set my theServerName to ""
+		set my theServerAPIKey to ""
 	end saveSettings:
 	
 	on getSettings:sender --re-read data from the defaults file

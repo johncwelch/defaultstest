@@ -110,6 +110,14 @@ script AppDelegate
 		my loadServerTable:(missing value) --reload table with read data, in this case, the table should be blank
 	end clearSettings
 	
+	on deleteServer:sender
+		current application's NSLog("current settings array contents: %@", my theSettingsController's arrangedObjects()) --everything in the settings
+		
+		current application's NSLog("current settings array contents: %@", my theServerTableController's selectedObjects()) -- the selected row
+		--we're going to have to translate the selected row to data we can use to modify my theSettingsList to pull that record out of it, then re-write that into the settings once that's done. 
+		
+	end deleteServer:
+	
 	on applicationShouldTerminate_(sender)
 		-- Insert code here to do any housekeeping before your application quits
 		return current application's NSTerminateNow

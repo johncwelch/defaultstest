@@ -789,21 +789,10 @@
                                                 <action selector="saveSettings:" target="Voe-Tx-rLC" id="ZPE-Nd-qg2"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FNg-wF-Jxw">
-                                            <rect key="frame" x="11" y="106" width="126" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Clear Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iy7-HJ-rlT">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="clearSettings:" target="Voe-Tx-rLC" id="EqI-K1-Bwe"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ACx-ji-71s">
-                                            <rect key="frame" x="11" y="139" width="105" height="32"/>
+                                            <rect key="frame" x="11" y="139" width="130" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Get Server" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q1e-bL-B08">
+                                            <buttonCell key="cell" type="push" title="Get All Servers" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q1e-bL-B08">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -899,6 +888,17 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="deleteServer:" target="Voe-Tx-rLC" id="SiP-NX-TCC"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FNg-wF-Jxw">
+                                            <rect key="frame" x="11" y="106" width="140" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Clear All Servers" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iy7-HJ-rlT">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="clearSettings:" target="Voe-Tx-rLC" id="EqI-K1-Bwe"/>
                                             </connections>
                                         </button>
                                     </subviews>

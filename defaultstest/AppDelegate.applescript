@@ -110,7 +110,7 @@ script AppDelegate
 		set my theServerAPIKey to ""
 	end saveSettings:
 	
-	on getSettings:sender --re-read data from the defaults file
+	on getSettings:sender --re-read ALL data from the defaults file
 		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
 		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --since we're
 		--re-reading from the disk, we have to do the temp NSArray --> NSMutableArray dance again.

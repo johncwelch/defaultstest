@@ -4,6 +4,15 @@
 --
 --  Created by John Welch on 6/7/18.
 --  Copyright © 2018 John Welch. All rights reserved.
+
+	--many, many, HUGE THANKS to Shane Stanley, MacScripter.net, Chris Nebel and many other people on twitter for helping me get this.
+	--this is just a thing I wrote so I could test basic server management for the Nagios REST API. It doesn't *do* anything with Nagios
+	--but I needed to learn how to do defaults. If you're managing truly large numbers of servers, this is not optimal, but for my needs,
+	--~ten servers, it's jes' peachy.
+
+	--yes, I am aware I could probably do what I want by manipulating the array controller directly, but this is a good first start.
+	--this is why we have forks in source control management :-P
+	--that's the next thing i'm doing with this.
 --
 
 script AppDelegate
@@ -12,8 +21,8 @@ script AppDelegate
 	--THAT TABLE CELL VIEW SHIT WILL MAKE YOU CRAZY
 	
 	-- IBOutlets
-	property theWindow : missing value
-	property theDefaults : missing value
+	property theWindow : missing value --referenceing outlet for the main window
+	property theDefaults : missing value --referencing outlet for our NSDefaults object
 	property theSettingsController : missing value -- server defaults array referencing outlet
 	property theServerTable : missing value --table view referencing outlet
 	property theServerTableController : missing value --server table array controller referencing outlet
@@ -24,16 +33,19 @@ script AppDelegate
 	property theServerURL : "" --bound to server URL text field
 	property theServerAPIKey : "" --bound to server API Key text field
 	
+	
 	property theTableServerName : "" --bound to server name column in table
 	property theTableServerURL : "" --bound to server url column in table
 	property theTableServerAPIKey : "" --bound to server API Key column in table
 	property theServerTableControllerArray : {} --bound to content of the server table controller, not used
+	
 	
 	property theTestDefaults: "" --not currently used
 	property theSettingsList: {} --what will be the list of records we pull from the prefs file
 	property theSettingsExist : "" --are there any settings already there?
 	property theServerList : {} --list used to load the table
 	property theDefaultsExist : "" --are there currently settings?
+	
 	
 	--this next line is only here to show how to clear out defaults if you're using a shared defautls controller
 	--current application's NSUserDefaultsController's sharedUserDefaultsController()'s revertToInitialValues: initialDefaults
@@ -48,14 +60,16 @@ script AppDelegate
 		set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --we do this because
 		--NSDefaults arrayForKey coerces NSMutableArray to NSArray, which is annoying
 		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults"
-		--current application's NSLog("theDefaultsExist: %@", my theDefaultsExist)
+		--current application's NSLog("theDefaultsExist: %@", my theDefaultsExist) --this is just here for when I need it elsewhere, I can
+		--copy/paste easier
 		
 		my theSettingsList's addObjectsFromArray:theTempArray --copy all the data from theTempArray into theSettingList, which keeps the
 		--latter mutable
 		if not my theDefaultsExist then
-			display dialog "there are no default settings written at launch"
+			display dialog "there are no default settings existing at launch" --my version of a first run warning. Slick, ain't it.
 		end if
 		my loadServerTable:(missing value) --load existing data into the server table.
+		tell my theServerTable to setDoubleAction:"deleteServer:" --this ties a doubleclick in the server to deleting that server.
 	end applicationWillFinishLaunching_
 	
 	on loadServerTable:sender --push the saved server array into a table
@@ -71,8 +85,10 @@ script AppDelegate
 		set my theServerList to {} --blank out the list for next use
 	end loadServerTable:
 	
-	on saveSettings:sender --
-		set theTempURL to my theServerURL as text  --Create a temp text version
+	on saveSettings:sender --this saves the info the user typed in, and gloms the nagios api URL onto the end. Saves time.
+		set theTempURL to my theServerURL as text  --Create a temp text version --I did this all AppleScript style, because it works
+		--and I was able to get it done faster this way. It may not execute as fast, but given the data sizes we're talking about,
+		--I doubt it's a problem on anything faster than a IIsi
 		set theLastChar to last character of theTempURL --get the last character of the URL
 		if theLastChar is "/" then --if it's a trailing "/"
 			set theTempURL to text 1 thru -2 of theTempURL --trim the last character of the string
@@ -81,13 +97,15 @@ script AppDelegate
 			--scoping maybe? <shrug>
 		end if
 		set my theServerURL to my theServerURL's stringByAppendingString:"/nagiosxi/api/v1/system/user?apikey=" --NSSTring append
+		--this has the side benefit of showing up in the text box, so the user has a nice visual feedback outside of the table
+		--for about .something seconds.
 		set thePrefsRecord to {serverName:my theServerName,serverURL:my theServerURL,serverAPIKey:my theServerAPIKey} --build the record
 		my theSettingsList's addObject:thePrefsRecord --add the record to the end of the settings list
 		set my theDefaultsExist to true --since we're writing a setting, we want to set this correctly.
 		theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
 		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1)
 		my loadServerTable:(missing value) --reload table with new data
-		set my theServerURL to ""
+		set my theServerURL to "" --if you don't want the text fields to clear, delete/comment out these last three lines
 		set my theServerName to ""
 		set my theServerAPIKey to ""
 	end saveSettings:

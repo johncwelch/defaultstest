@@ -43,7 +43,6 @@ script AppDelegate
     property theTestDefaults: "" --not currently used
     property theSettingsList: {} --what will be the list of records we pull from the prefs file
     property theSettingsExist : "" --are there any settings already there?
-    --property theServerList : {} --list used to load the table, may be unecessary now
     property theDefaultsExist : "" --are there currently settings?
     
     
@@ -76,9 +75,7 @@ script AppDelegate
         my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
         --array controller
         my theServerTableController's addObjects:my theSettingsList --shove the current contents of theSettingsList into the array controller
-        --current application's NSLog("the server list: %@", my theServerList)
         set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --grab current state for this every time this function runs
-        --set my theServerList to {} --blank out the list for next use
     end loadServerTable:
     
     on saveSettings:sender --this saves the info the user typed in, and gloms the nagios api URL onto the end. Saves time.

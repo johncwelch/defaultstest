@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14269.12" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,7 +16,6 @@
             <connections>
                 <outlet property="theServerTable" destination="DFr-K3-nQZ" id="ipJ-ZO-5KE"/>
                 <outlet property="theServerTableController" destination="zrh-YM-Lm8" id="bhG-gz-UXu"/>
-                <outlet property="theSettingsController" destination="QfI-vR-BBd" id="MSK-fx-g2P"/>
                 <outlet property="theWindow" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -105,7 +104,8 @@
                                     <action selector="saveDocument:" target="-1" id="teZ-XB-qJY"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
+                            <menuItem title="Save As…" keyEquivalent="s" id="Bw7-FT-i3A">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="saveDocumentAs:" target="-1" id="mDf-zr-I0C"/>
                                 </connections>
@@ -687,7 +687,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="708" height="379"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
             <value key="minSize" type="size" width="708" height="379"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="708" height="379"/>
@@ -805,7 +805,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="KqW-RR-qMu">
                                                 <rect key="frame" x="1" y="0.0" width="311" height="296"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="NWj-oE-2OF" viewBased="YES" id="DFr-K3-nQZ">
                                                         <rect key="frame" x="0.0" y="0.0" width="311" height="271"/>
@@ -814,7 +814,7 @@
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn width="101" minWidth="40" maxWidth="1000" id="qRn-d0-zkH">
+                                                            <tableColumn identifier="" width="101" minWidth="40" maxWidth="1000" id="qRn-d0-zkH">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Server Name">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -830,7 +830,7 @@
                                                                     <binding destination="zrh-YM-Lm8" name="value" keyPath="arrangedObjects.theTableServerName" id="hgd-Xq-9xu"/>
                                                                 </connections>
                                                             </tableColumn>
-                                                            <tableColumn width="105" minWidth="40" maxWidth="1000" id="cj5-tf-7IR">
+                                                            <tableColumn identifier="" width="105" minWidth="40" maxWidth="1000" id="cj5-tf-7IR">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Server URL">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -846,7 +846,7 @@
                                                                     <binding destination="zrh-YM-Lm8" name="value" keyPath="arrangedObjects.theTableServerURL" id="7ik-TG-IWI"/>
                                                                 </connections>
                                                             </tableColumn>
-                                                            <tableColumn width="96" minWidth="10" maxWidth="3.4028234663852886e+38" id="z70-q3-g4E">
+                                                            <tableColumn identifier="" width="96" minWidth="10" maxWidth="3.4028234663852886e+38" id="z70-q3-g4E">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Server API Key">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -867,7 +867,7 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="idd-bI-6pJ">
-                                                <rect key="frame" x="1" y="276" width="311" height="15"/>
+                                                <rect key="frame" x="1" y="10" width="0.0" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="uh5-Yp-4Ca">
@@ -916,16 +916,6 @@
             </view>
             <point key="canvasLocation" x="246" y="-414.5"/>
         </window>
-        <arrayController id="QfI-vR-BBd">
-            <connections>
-                <binding destination="Voe-Tx-rLC" name="contentArray" keyPath="theSettingsList" id="F9h-xp-I07">
-                    <dictionary key="options">
-                        <bool key="NSHandlesContentAsCompoundValue" value="YES"/>
-                        <bool key="NSValidatesImmediately" value="YES"/>
-                    </dictionary>
-                </binding>
-            </connections>
-        </arrayController>
         <arrayController id="zrh-YM-Lm8">
             <connections>
                 <binding destination="Voe-Tx-rLC" name="contentArray" keyPath="theServerTableControllerArray" id="FFE-ui-VIv">

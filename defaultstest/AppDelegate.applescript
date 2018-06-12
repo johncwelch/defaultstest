@@ -23,7 +23,6 @@ script AppDelegate
     -- IBOutlets
     property theWindow : missing value --referenceing outlet for the main window
     property theDefaults : missing value --referencing outlet for our NSDefaults object
-    property theSettingsController : missing value -- server defaults array referencing outlet not used anywhere
     property theServerTable : missing value --table view referencing outlet
     property theServerTableController : missing value --server table array controller referencing outlet
     
@@ -41,7 +40,6 @@ script AppDelegate
     
     
     property theTestDefaults: "" --not currently used
-    property theSettingsList: {} --what will be the list of records we pull from the prefs file
     property theSettingsExist : "" --are there any settings already there?
     property theDefaultsExist : "" --are there currently settings?
     

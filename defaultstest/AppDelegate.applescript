@@ -72,15 +72,11 @@ script AppDelegate
 		tell my theServerTable to setDoubleAction:"deleteServer:" --this ties a doubleclick in the server to deleting that server.
 	end applicationWillFinishLaunching_
 	
-	on loadServerTable:sender --push the saved server array into a table
-		set my theServerList to {} --blank out the list for next use
-		repeat with x from 1 to count of my theSettingsList --iterate through the settings list to build the record we'll use here
-			set theItem to item x of my theSettingsList as record
-			set the end of my theServerList to {theTableServerName:serverName of theItem,theTableServerURL:serverURL of theItem,theTableServerAPIKey:serverAPIKey of theItem} --DON'T use "my" here, it really hates it.
-		end repeat
+	on loadServerTable:sender --push the saved server array theSettingsList into an array controller that runs a table
 		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
 		--array controller
-		my theServerTableController's addObjects:my theServerList --shove all that data in theServerList into the array controller
+		my theServerTableController's addObjects:my theSettingsList --shove the current contents of theSettingsList into the array controller
+		--current application's NSLog("the server list: %@", my theServerList)
 		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --grab current state for this every time this function runs
 		set my theServerList to {} --blank out the list for next use
 	end loadServerTable:
@@ -89,22 +85,32 @@ script AppDelegate
 		set theTempURL to my theServerURL as text  --Create a temp text version --I did this all AppleScript style, because it works
 		--and I was able to get it done faster this way. It may not execute as fast, but given the data sizes we're talking about,
 		--I doubt it's a problem on anything faster than a IIsi
+		
 		set theLastChar to last character of theTempURL --get the last character of the URL
+		
 		if theLastChar is "/" then --if it's a trailing "/"
 			set theTempURL to text 1 thru -2 of theTempURL --trim the last character of the string
 			set my theServerURL to current application's NSString's stringWithString:theTempURL --rewrite theServerURL. As it turns out,
 			--you have to use the current application's NSString's stringWithString for this, NOT theServerURL's stringWithString. Beats me
 			--scoping maybe? <shrug>
 		end if
+		
 		set my theServerURL to my theServerURL's stringByAppendingString:"/nagiosxi/api/v1/system/user?apikey=" --NSSTring append
 		--this has the side benefit of showing up in the text box, so the user has a nice visual feedback outside of the table
 		--for about .something seconds.
-		set thePrefsRecord to {serverName:my theServerName,serverURL:my theServerURL,serverAPIKey:my theServerAPIKey} --build the record
+		
+		set thePrefsRecord to {theTableServerName:my theServerName,theTableServerURL:my theServerURL,theTableServerAPIKey:my theServerAPIKey} --build the record
+		
 		my theSettingsList's addObject:thePrefsRecord --add the record to the end of the settings list
+		
 		set my theDefaultsExist to true --since we're writing a setting, we want to set this correctly.
+		
 		theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
 		theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1)
-		my loadServerTable:(missing value) --reload table with new data
+		
+		my loadServerTable:(missing value) --reload the server table function call. There's some cleanup that we'd have to dupe if we did it here
+		--anyway, so there's no point in not doing this
+	
 		set my theServerURL to "" --if you don't want the text fields to clear, delete/comment out these last three lines
 		set my theServerName to ""
 		set my theServerAPIKey to ""
@@ -117,44 +123,59 @@ script AppDelegate
 		my theSettingsList's addObjectsFromArray:theTempArray --reload our NSMutableArray so it doesn't get coerced to NSArray
 		set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --pull the "do we even have default settings" flag
 		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
-		my loadServerTable:(missing value) --reload table with read data
+		my theServerTableController's addObjects:my theSettingsList --shove the current contents of thePrefsRecord into the array controller
+		--my loadServerTable:(missing value) --reload table with read data
 	end getSettings:
 	
 	on clearSettings:sender
 		theDefaults's removeObjectForKey:"serverSettingsList" --blank out defaults plist on disk
 		theDefaults's removeObjectForKey:"hasDefaults" --blank out the hasDefaults key, that is now false (0). Well, actually, it's nonexistent
 		--but really, that's the same thing for our needs. We can fix this later if we want.
-		my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
-		my loadServerTable:(missing value) --reload table with read data, in this case, the table should be blank
+		my theSettingsList's removeAllObjects() -- blank out theSettingsList. The () IS IMPORTANT
+		my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
+		--array controller here, rather than rerunning the loadserver function just to load an empty list
 	end clearSettings
 	
 	on deleteServer:sender
-		set theTestIndex to my theServerTable's selectedRow() --get the index of the currently selected row from the table
-		my theSettingsList's removeObjectAtIndex:theTestIndex --delete that from theSettingsList. Since the table is built from theSettingsSlist,
-		--this is somewhat dicey, but safe given that we immediately rebuild the table AND the prefs on clicking the button.
-		--if we want to delete multiple servers, this will need to be changed.
+		my theServerTableController's remove:(theServerTableController's selectedObjects()) --deletes the selected row right out of the controller
+		--my god, this was so easy once I doped it out
 		
-		--reload the server table in the UI. We do this first so the user can see their actions have taken.
-		my loadServerTable:(missing value)
+		my theSettingsList's removeAllObjects() --blow out theSettingsList
+		my theSettingsList's addObjectsFromArray:(theServerTableController's arrangedObjects()) --rebuild it from theArrayController
+		
+		current application's NSLog("remaining objects in theServerTableController: %@", my theServerTableController's arrangedObjects())
+		
+		set theServerTableControllerObjectCount to my theServerTableController's arrangedObjects()'s |count|() --get number of objects left in
+		--the controller
+		log theTest as text
+		
+		
 		
 		--write the new prefs to disk. We really should warn the user that this is not undoable.
 		--first, test to make sure the prefs aren't zero length
-		set theSettingsListLength to my theSettingsList's |count|() --get number of entries in the array.
+		
+		--set theSettingsListLength to my theSettingsList's |count|() --get number of entries in the array.
+		
 		--we need to do this before we act on writing things to disk.
-		if theSettingsListLength = 0 then --if the list is empty (we just deleted the last thing) then we'll call clear settings and save time
+		
+		--if theSettingsListLength = 0 then --if the list is empty (we just deleted the last thing) then we'll call clear settings and save time
 			--since that's what clear settings does, if you think about it
-			my clearSettings:(missing value) --this handles explicitly clearing the defaults AND hasDefaults for us.
-		else
+		--	my clearSettings:(missing value) --this handles explicitly clearing the defaults AND hasDefaults for us.
+		--else
 			--so we have entries in the array, let's write that to disk
-			set my theDefaultsExist to true --if we're in this stage of the if, there's at least one row in theSettingsList,
+		
+		--	set my theDefaultsExist to true --if we're in this stage of the if, there's at least one row in theSettingsList,
+		
 			--so we want to make sure theDefaultsExist is correct.
-			theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
-			theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1), this way we avoid the
-			--"but I thought it was okay" problem. We don't think we know what hasDefaults is on exit, we KNOW
+		--	theDefaults's setObject:my theSettingsList forKey:"serverSettingsList" --write the new settings list to defaults
+		--	theDefaults's setBool:my theDefaultsExist forKey:"hasDefaults" --setting hasDefaults to true (1), this way we avoid the
+		
+		--"but I thought it was okay" problem. We don't think we know what hasDefaults is on exit, we KNOW
 
 			
-		end if
-		my loadServerTable:(missing value) -- regardless of the if statement tree, we want to do this for both. if this ever gets really big
+		--end if
+		--my loadServerTable:(missing value) -- regardless of the if statement tree, we want to do this for both. if this ever gets really big
+		
 		--we'll change this behavior, but it would have to get pretty damned big to be a problem.
 		
 	end deleteServer:

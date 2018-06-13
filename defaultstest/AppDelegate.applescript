@@ -18,7 +18,7 @@
 script AppDelegate
     property parent : class "NSObject"
     --FOR THE LOVE OF GOD, REMEMBER TO MAKE SURE THE ONLY THING IN A TABLE COLUMN IS THE COLUMN NAME AND THE TEXT CELL,
-    --THAT TABLE CELL VIEW SHIT WILL MAKE YOU CRAZY
+    --THAT TABLE CELL VIEW SHIT WILL MAKE YOU CRAZY   
     
     -- IBOutlets
     property theWindow : missing value --referenceing outlet for the main window

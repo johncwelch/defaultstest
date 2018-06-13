@@ -42,6 +42,7 @@ script AppDelegate
     property theTestDefaults: "" --not currently used
     property theSettingsExist : "" --are there any settings already there?
     property theDefaultsExist : "" --are there currently settings?
+    property theSettingsList : {} --settings list array
     
     
     --this next line is only here to show how to clear out defaults if you're using a shared defautls controller
@@ -50,18 +51,15 @@ script AppDelegate
     on applicationWillFinishLaunching_(aNotification)
         set theDefaults to current application's NSUserDefaults's standardUserDefaults() --make theDefaults the container
         --for defaults operations
-        theDefaults's registerDefaults:{serverSettingsList:""} --sets up "serverSettingsList" as a valid defaults key
-        --of the keys used in the defaults
-        set my theSettingsList to current application's NSMutableArray's arrayWithCapacity:1 --initialize the internal array
-        --we use for this
-        set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --we do this because
-        --NSDefaults arrayForKey coerces NSMutableArray to NSArray, which is annoying
+	   my theDefaults's registerDefaults:{serverSettingsList:{}} --sets up "serverSettingsList" as a valid defaults key.
+        --changed serverSettingsList to init as an array, not text, per Chris Nebel's advice.
+	   set my theSettingsList to (my theDefaults's arrayForKey:"serverSettingsList")'s mutableCopy() --yanked a lot of unneeded code again per
+	   --chris nebel suggestion again, and it works. wraps the array init, defaults pull and keeps it mutable in one step. WOOT!
+	   
         set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults"
         --current application's NSLog("theDefaultsExist: %@", my theDefaultsExist) --this is just here for when I need it elsewhere, I can
         --copy/paste easier
-        
-        my theSettingsList's addObjectsFromArray:theTempArray --copy all the data from theTempArray into theSettingList, which keeps the
-        --latter mutable
+	   
         if not my theDefaultsExist then
             display dialog "there are no default settings existing at launch" --my version of a first run warning. Slick, ain't it.
         end if
@@ -113,10 +111,9 @@ script AppDelegate
     
     on getSettings:sender --re-read ALL data from the defaults file
         my theSettingsList's removeAllObjects() -- blank out theSettingsList since we're reloading it. The () IS IMPORTANT
-        set theTempArray to current application's NSArray's arrayWithArray:(theDefaults's arrayForKey:"serverSettingsList") --since we're
-        --re-reading from the disk, we have to do the temp NSArray --> NSMutableArray dance again.
-        my theSettingsList's addObjectsFromArray:theTempArray --reload our NSMutableArray so it doesn't get coerced to NSArray
-        set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --pull the "do we even have default settings" flag
+	   set my theSettingsList to (my theDefaults's arrayForKey:"serverSettingsList")'s mutableCopy()
+	   
+	   set my theDefaultsExist to theDefaults's boolForKey:"hasDefaults" --pull the "do we even have default settings" flag
         my theServerTableController's removeObjects:(theServerTableController's arrangedObjects()) --blow out contents of that
         my theServerTableController's addObjects:my theSettingsList --shove the current contents of thePrefsRecord into the array controller
         --my loadServerTable:(missing value) --reload table with read data
